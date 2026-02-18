@@ -1,0 +1,841 @@
+/* ── Custom Properties (palette from mockup) ──────────────────────────── */
+:root {
+  --bg: #FAF6F1;
+  --surface: #FFFFFF;
+  --surface-alt: #F3EDE4;
+  --border: #E8DFD3;
+  --text: #2C2418;
+  --text-muted: #8C7E6A;
+  --accent: #C4632A;
+  --accent-light: #F9E8DD;
+  --accent-dark: #A04E1C;
+  --green: #5A8F5C;
+  --green-light: #E8F3E8;
+  --tag: #6B8A6B;
+  --font: 'DM Sans', 'Avenir', sans-serif;
+  --font-display: 'Playfair Display', 'Georgia', serif;
+}
+
+/* ── Reset & Base ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 32px 0 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  text-decoration: none;
+}
+
+.logo-sub {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+/* ── Nav / Mode toggle ────────────────────────────────────────────────── */
+.nav-links {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.nav-links a,
+.mode-toggle button {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: var(--font);
+  background: transparent;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.nav-links a.active,
+.mode-toggle button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-alt);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+/* ── Unit toggle ──────────────────────────────────────────────────────── */
+.unit-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-alt);
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+
+.unit-toggle button {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  background: transparent;
+  color: var(--text-muted);
+  transition: all 0.2s;
+}
+
+.unit-toggle button.active {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ── Recipe grid ──────────────────────────────────────────────────────── */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* ── Recipe card ──────────────────────────────────────────────────────── */
+.recipe-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.recipe-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.recipe-card.in-plan {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.recipe-card.in-plan:hover {
+  box-shadow: 0 0 0 2px var(--accent-light), 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.card-img {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+  background: linear-gradient(135deg, var(--surface-alt), var(--bg));
+}
+
+.card-body {
+  padding: 16px 18px 18px;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ── Tags ─────────────────────────────────────────────────────────────── */
+.tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  background: var(--green-light);
+  color: var(--tag);
+  margin-right: 6px;
+  margin-bottom: 4px;
+}
+
+.tag--accent {
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+/* ── Back link ────────────────────────────────────────────────────────── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 500;
+  font-family: var(--font);
+  padding: 0;
+  margin-bottom: 24px;
+  text-decoration: none;
+}
+
+/* ── Detail page ──────────────────────────────────────────────────────── */
+.detail-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.detail-emoji {
+  font-size: 48px;
+}
+
+.detail-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+
+.detail-columns {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 32px;
+  margin-top: 32px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* ── Ingredients ──────────────────────────────────────────────────────── */
+.ingredient-list {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 4px 16px;
+}
+
+.ingredient-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.ingredient-row:last-child {
+  border-bottom: none;
+}
+
+.ingredient-name {
+  font-weight: 500;
+}
+
+.ingredient-amount {
+  color: var(--text-muted);
+}
+
+/* ── Steps ────────────────────────────────────────────────────────────── */
+.step {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+/* ── Meal plan banner ─────────────────────────────────────────────────── */
+.plan-banner {
+  background: var(--accent-light);
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--accent-dark);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Bottom bar (meal plan) ───────────────────────────────────────────── */
+.plan-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--text);
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  z-index: 100;
+  font-family: var(--font);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.plan-bar.visible {
+  transform: translateY(0);
+}
+
+.plan-bar-items {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.plan-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.plan-bar-item-emoji {
+  font-size: 18px;
+}
+
+.plan-bar-item-title {
+  font-size: 13px;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.3);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+}
+
+.qty-btn:hover {
+  border-color: rgba(255,255,255,0.6);
+}
+
+.qty-value {
+  font-size: 15px;
+  font-weight: 600;
+  min-width: 16px;
+  text-align: center;
+}
+
+.plan-btn {
+  padding: 8px 24px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font);
+}
+
+.plan-btn:hover {
+  background: var(--accent-dark);
+}
+
+/* ── Shopping list ────────────────────────────────────────────────────── */
+.list-section {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 28px;
+  margin-top: 8px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.list-item:last-child {
+  border-bottom: none;
+}
+
+.list-item-name {
+  font-weight: 500;
+}
+
+.list-item-amount {
+  color: var(--accent);
+  font-weight: 600;
+  background: var(--accent-light);
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.list-footer {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.empty-state-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+/* ── Ingredient management ────────────────────────────────────────────── */
+.ingredient-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.ingredient-table th,
+.ingredient-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.ingredient-table th {
+  background: var(--surface-alt);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.ingredient-table tr:last-child td {
+  border-bottom: none;
+}
+
+.ingredient-table tr:hover td {
+  background: var(--surface-alt);
+}
+
+/* ── Forms ────────────────────────────────────────────────────────────── */
+.form-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font);
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+}
+
+.btn-secondary {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
+.btn-secondary:hover {
+  background: var(--border);
+}
+
+/* ── Flash messages ───────────────────────────────────────────────────── */
+.flash {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.flash-success {
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.flash-error {
+  background: #fde8e8;
+  color: #c53030;
+}
+
+/* ── Search/filter ────────────────────────────────────────────────────── */
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--surface);
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+/* ── Login page ───────────────────────────────────────────────────────── */
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+/* ── Nav auth link ────────────────────────────────────────────────────── */
+.nav-auth {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 8px 14px;
+  border-left: 1px solid var(--border);
+  margin-left: 4px;
+}
+
+.nav-auth:hover {
+  color: var(--accent);
+}
+
+/* ── Recipe form ──────────────────────────────────────────────────────── */
+.ing-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ing-row input[type="text"] {
+  flex: 2;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.ing-row input[type="number"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.ing-row select {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.ing-row input:focus,
+.ing-row select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.btn-remove {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 10px;
+  line-height: 1;
+}
+
+.btn-remove:hover {
+  color: #c53030;
+  border-color: #c53030;
+}
+
+.recipe-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  resize: vertical;
+  min-height: 160px;
+  line-height: 1.6;
+}
+
+.recipe-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-light);
+}
+
+.image-preview {
+  margin-bottom: 8px;
+}
+
+.image-preview img {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.btn-danger {
+  background: #c53030;
+  color: #fff;
+  margin-left: auto;
+}
+
+.btn-danger:hover {
+  background: #9b2c2c;
+}
+
+/* ── Admin controls on detail page ───────────────────────────────────── */
+.admin-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.source-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.source-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Detail image ────────────────────────────────────────────────────── */
+.detail-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+/* ── Card image file ─────────────────────────────────────────────────── */
+.card-img-file {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── New recipe card ─────────────────────────────────────────────────── */
+.new-recipe-card {
+  border-style: dashed;
+  text-decoration: none;
+}
+
+.new-recipe-img {
+  font-size: 48px;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .detail-columns {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .detail-title {
+    font-size: 28px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

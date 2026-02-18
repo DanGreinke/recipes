@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Ingredients — Our Kitchen{% endblock %}
+
+{% block content %}
+<div class="detail-title" style="margin-bottom:24px;">Ingredients</div>
+
+<!-- Add / Edit form (admin only) -->
+{% if is_admin %}
+<div class="form-card">
+    <div class="section-title" id="form-title">Add Ingredient</div>
+    <form method="POST" action="{{ url_for('ingredients_page') }}" id="ingredient-form">
+        <input type="hidden" name="ingredient_id" id="ingredient_id" value="">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="unit_type">Unit Type</label>
+                <select id="unit_type" name="unit_type">
+                    <option value="volume">Volume</option>
+                    <option value="count">Count</option>
+                    <option value="both">Both</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Volume fields -->
+        <div id="volume-fields">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="volume_amount">Volume Amount</label>
+                    <input type="number" id="volume_amount" name="volume_amount" step="any" placeholder="e.g. 1">
+                </div>
+                <div class="form-group">
+                    <label for="volume_unit">Volume Unit</label>
+                    <select id="volume_unit" name="volume_unit">
+                        <option value="cup">cup</option>
+                        <option value="tablespoons">tablespoons</option>
+                        <option value="teaspoons">teaspoons</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ounces">Ounces</label>
+                    <input type="number" id="ounces" name="ounces" step="any" placeholder="e.g. 4.25">
+                </div>
+                <div class="form-group">
+                    <label for="grams">Grams</label>
+                    <input type="number" id="grams" name="grams" step="any" placeholder="e.g. 120">
+                </div>
+            </div>
+        </div>
+
+        <!-- Count fields -->
+        <div id="count-fields" style="display:none;">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="avg_weight_grams">Avg Weight per Unit (grams, optional)</label>
+                    <input type="number" id="avg_weight_grams" name="avg_weight_grams" step="any" placeholder="e.g. 50">
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:8px;">
+            <button type="submit" class="btn btn-primary" id="form-submit">Add Ingredient</button>
+            <button type="button" class="btn btn-secondary" id="form-cancel" style="display:none;" onclick="resetForm()">Cancel</button>
+        </div>
+    </form>
+</div>
+{% endif %}
+
+<!-- Search -->
+<input type="text" class="search-input" id="ingredient-search" placeholder="Search ingredients...">
+
+<!-- Ingredient table -->
+<table class="ingredient-table" id="ingredient-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Volume</th>
+            <th>Grams/Cup</th>
+            {% if is_admin %}<th>Actions</th>{% endif %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for ing in ingredients %}
+        <tr data-name="{{ ing.name|lower }}">
+            <td>{{ ing.name }}</td>
+            <td>{{ ing.unit_type }}</td>
+            <td>
+                {% if ing.volume_amount %}
+                {{ ing.volume_amount }} {{ ing.volume_unit }}
+                {% elif ing.unit_type == 'count' %}
+                —
+                {% endif %}
+            </td>
+            <td>{{ ing.grams_per_cup if ing.grams_per_cup else '—' }}</td>
+            {% if is_admin %}
+            <td>
+                <button class="btn btn-secondary" style="padding:4px 12px;font-size:12px;"
+                        onclick="editIngredient({{ ing.id }}, '{{ ing.name|e }}', '{{ ing.unit_type }}', {{ ing.volume_amount or 'null' }}, '{{ ing.volume_unit or '' }}', {{ ing.ounces or 'null' }}, {{ ing.grams or 'null' }}, {{ ing.avg_weight_grams or 'null' }})">
+                    Edit
+                </button>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% block scripts %}
+<script>
+{% if is_admin %}
+// Unit type toggle
+document.getElementById("unit_type").addEventListener("change", function() {
+    var val = this.value;
+    var volumeFields = document.getElementById("volume-fields");
+    var countFields = document.getElementById("count-fields");
+    if (val === "volume") {
+        volumeFields.style.display = "block";
+        countFields.style.display = "none";
+    } else if (val === "count") {
+        volumeFields.style.display = "none";
+        countFields.style.display = "block";
+    } else { // both
+        volumeFields.style.display = "block";
+        countFields.style.display = "block";
+    }
+});
+
+// Search filter
+document.getElementById("ingredient-search").addEventListener("input", function() {
+    var query = this.value.toLowerCase();
+    var rows = document.querySelectorAll("#ingredient-table tbody tr");
+    rows.forEach(function(row) {
+        var name = row.dataset.name || "";
+        row.style.display = name.indexOf(query) !== -1 ? "" : "none";
+    });
+});
+
+// Edit ingredient
+function editIngredient(id, name, unitType, volAmt, volUnit, ounces, grams, avgWeight) {
+    document.getElementById("ingredient_id").value = id;
+    document.getElementById("name").value = name;
+    document.getElementById("unit_type").value = unitType;
+    document.getElementById("unit_type").dispatchEvent(new Event("change"));
+    document.getElementById("volume_amount").value = volAmt != null ? volAmt : "";
+    document.getElementById("volume_unit").value = volUnit || "cup";
+    document.getElementById("ounces").value = ounces != null ? ounces : "";
+    document.getElementById("grams").value = grams != null ? grams : "";
+    document.getElementById("avg_weight_grams").value = avgWeight != null ? avgWeight : "";
+
+    document.getElementById("form-title").textContent = "Edit Ingredient";
+    document.getElementById("form-submit").textContent = "Update Ingredient";
+    document.getElementById("form-cancel").style.display = "inline-block";
+    document.getElementById("ingredient-form").action = "/ingredients/" + id + "/edit";
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Reset form
+function resetForm() {
+    document.getElementById("ingredient_id").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("unit_type").value = "volume";
+    document.getElementById("unit_type").dispatchEvent(new Event("change"));
+    document.getElementById("volume_amount").value = "";
+    document.getElementById("volume_unit").value = "cup";
+    document.getElementById("ounces").value = "";
+    document.getElementById("grams").value = "";
+    document.getElementById("avg_weight_grams").value = "";
+
+    document.getElementById("form-title").textContent = "Add Ingredient";
+    document.getElementById("form-submit").textContent = "Add Ingredient";
+    document.getElementById("form-cancel").style.display = "none";
+    document.getElementById("ingredient-form").action = "{{ url_for('ingredients_page') }}";
+}
+{% endif %}
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,20 @@
+<div class="recipe-card" data-recipe-id="{{ recipe.id }}" data-title="{{ recipe.title }}" data-image="{{ recipe.image_path }}">
+    <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="card-link" style="text-decoration:none;color:inherit;display:block;">
+        {% if recipe.image_path and recipe.image_path.startswith('static/') %}
+        <div class="card-img"><img src="{{ url_for('static', filename=recipe.image_path[7:]) }}" alt="{{ recipe.title }}" class="card-img-file"></div>
+        {% else %}
+        <div class="card-img">{{ recipe.image_path }}</div>
+        {% endif %}
+        <div class="card-body">
+            <div class="card-title">{{ recipe.title }}</div>
+            <div class="card-tags">
+                {% for tag in recipe.tags.split(',') %}
+                {% if tag.strip() %}
+                <span class="tag">{{ tag.strip() }}</span>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </a>
+    <div class="badge" style="display:none;"></div>
+</div>

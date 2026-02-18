@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} — Our Kitchen{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('home') }}" class="back-link">&larr; Back to recipes</a>
+
+<div class="detail-header">
+    {% if recipe.image_path and recipe.image_path.startswith('static/') %}
+    <img src="{{ url_for('static', filename=recipe.image_path[7:]) }}" alt="{{ recipe.title }}" class="detail-image">
+    {% else %}
+    <span class="detail-emoji">{{ recipe.image_path }}</span>
+    {% endif %}
+    <div>
+        <div class="detail-title">{{ recipe.title }}</div>
+        <div>
+            {% for tag in recipe.tags.split(',') %}
+            {% if tag.strip() %}
+            <span class="tag">{{ tag.strip() }}</span>
+            {% endif %}
+            {% endfor %}
+            <span class="tag tag--accent">Serves {{ recipe.servings }}</span>
+        </div>
+        {% if recipe.source_url %}
+        <a href="{{ recipe.source_url }}" target="_blank" rel="noopener" class="source-link">View original source</a>
+        {% endif %}
+        {% if is_admin %}
+        <div class="admin-controls">
+            <a href="{{ url_for('recipe_edit', recipe_id=recipe.id) }}" class="btn btn-secondary">Edit</a>
+            <form method="POST" action="{{ url_for('recipe_delete', recipe_id=recipe.id) }}" style="display:inline;" onsubmit="return confirm('Delete this recipe?');">
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="detail-columns">
+    <!-- Ingredients -->
+    <div>
+        <div class="section-header">
+            <div class="section-title">Ingredients</div>
+        </div>
+        <div class="unit-toggle" id="detail-unit-toggle">
+            <button class="active" data-unit="volume">Volume</button>
+            <button data-unit="weight">Weight</button>
+        </div>
+        <div class="ingredient-list" id="ingredient-list">
+            {% for ing in ingredients %}
+            <div class="ingredient-row" data-amount="{{ ing.amount }}" data-unit="{{ ing.unit }}"
+                 data-grams-per-cup="{{ ing.grams_per_cup or '' }}"
+                 data-unit-type="{{ ing.unit_type or 'volume' }}"
+                 data-avg-weight="{{ ing.avg_weight_grams or '' }}">
+                <span class="ingredient-name">{{ ing.name }}</span>
+                <span class="ingredient-amount">{{ format_amount(ing.amount) }} {{ ing.unit }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Steps -->
+    <div>
+        <div class="section-title">Instructions</div>
+        {% for step in steps %}
+        <div class="step">
+            <div class="step-num">{{ step.step_number }}</div>
+            <div class="step-text">{{ step.instruction }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

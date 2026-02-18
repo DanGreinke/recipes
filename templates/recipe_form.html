@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}{{ "Edit " + recipe.title if recipe else "New Recipe" }} — Our Kitchen{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('recipe_detail', recipe_id=recipe.id) if recipe else url_for('home') }}" class="back-link">&larr; {{ "Back to recipe" if recipe else "Back to recipes" }}</a>
+
+<div class="detail-title">{{ "Edit Recipe" if recipe else "New Recipe" }}</div>
+
+<form method="POST" enctype="multipart/form-data" class="recipe-form">
+    <div class="form-card">
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required
+                       value="{{ recipe.title if recipe else '' }}">
+            </div>
+            <div class="form-group">
+                <label for="servings">Servings</label>
+                <input type="number" id="servings" name="servings" min="1"
+                       value="{{ recipe.servings if recipe else 4 }}">
+            </div>
+            <div class="form-group">
+                <label for="tags">Tags (comma-separated)</label>
+                <input type="text" id="tags" name="tags"
+                       value="{{ recipe.tags if recipe else '' }}">
+            </div>
+            <div class="form-group">
+                <label for="source_url">Source URL (optional)</label>
+                <input type="url" id="source_url" name="source_url"
+                       value="{{ recipe.source_url if recipe and recipe.source_url else '' }}"
+                       placeholder="https://...">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="image">Image</label>
+            {% if recipe and recipe.image_path and recipe.image_path.startswith('static/') %}
+            <div class="image-preview">
+                <img src="{{ url_for('static', filename=recipe.image_path[7:]) }}" alt="Current image">
+            </div>
+            {% endif %}
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+    </div>
+
+    <!-- Ingredients -->
+    <div class="form-card">
+        <div class="section-title">Ingredients</div>
+        <div id="ingredient-rows">
+            {% if ingredients %}
+            {% for ing in ingredients %}
+            <div class="ing-row">
+                <input type="text" name="ing_name[]" placeholder="Ingredient name" value="{{ ing.name }}">
+                <input type="number" name="ing_amount[]" placeholder="Amount" step="any" value="{{ ing.amount }}">
+                <select name="ing_unit[]">
+                    {% for u in ['cups','tbsp','tsp','count','grams','oz','lb','pieces'] %}
+                    <option value="{{ u }}" {{ 'selected' if ing.unit == u else '' }}>{{ u }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>
+            </div>
+            {% endfor %}
+            {% else %}
+            {% for _ in range(3) %}
+            <div class="ing-row">
+                <input type="text" name="ing_name[]" placeholder="Ingredient name">
+                <input type="number" name="ing_amount[]" placeholder="Amount" step="any">
+                <select name="ing_unit[]">
+                    {% for u in ['cups','tbsp','tsp','count','grams','oz','lb','pieces'] %}
+                    <option value="{{ u }}">{{ u }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <button type="button" class="btn btn-secondary" id="add-ingredient-btn" style="margin-top:8px;">+ Add Ingredient</button>
+    </div>
+
+    <!-- Instructions -->
+    <div class="form-card">
+        <div class="section-title">Instructions</div>
+        <div class="form-group">
+            <label for="instructions">One step per paragraph (separate with blank lines)</label>
+            <textarea id="instructions" name="instructions" rows="10" class="recipe-textarea">{{ steps_text }}</textarea>
+        </div>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">{{ "Update Recipe" if recipe else "Create Recipe" }}</button>
+        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) if recipe else url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        {% if recipe %}
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">Delete Recipe</button>
+        {% endif %}
+    </div>
+</form>
+
+{% if recipe %}
+<form id="delete-form" method="POST" action="{{ url_for('recipe_delete', recipe_id=recipe.id) }}" style="display:none;"></form>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function removeIngRow(btn) {
+    var rows = document.getElementById('ingredient-rows');
+    if (rows.children.length > 1) {
+        btn.closest('.ing-row').remove();
+    }
+}
+
+document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+    var rows = document.getElementById('ingredient-rows');
+    var first = rows.querySelector('.ing-row');
+    var clone = first.cloneNode(true);
+    clone.querySelectorAll('input').forEach(function(inp) { inp.value = ''; });
+    clone.querySelector('select').selectedIndex = 0;
+    rows.appendChild(clone);
+});
+
+function confirmDelete() {
+    if (confirm('Are you sure you want to delete this recipe? This cannot be undone.')) {
+        document.getElementById('delete-form').submit();
+    }
+}
+</script>
+{% endblock %}

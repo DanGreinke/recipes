@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.kingarthurbaking.com)",
+      "Bash(python3:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)"
+    ]
+  }
+}

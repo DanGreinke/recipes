@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="home-view">
+    <!-- Mode toggle -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+        <div class="mode-toggle">
+            <button class="active" data-mode="browse">Recipes</button>
+            <button data-mode="plan">Meal Plan</button>
+        </div>
+    </div>
+
+    <!-- Plan mode banner (hidden by default) -->
+    <div class="plan-banner" id="plan-banner" style="display:none;">
+        <span style="font-size:18px;">&#x1F446;</span>
+        Tap recipes to add them to your meal plan. Adjust quantities below.
+    </div>
+
+    <!-- Recipe grid -->
+    <div class="recipe-grid" id="recipe-grid">
+        {% if is_admin %}
+        <a href="{{ url_for('recipe_new') }}" class="recipe-card new-recipe-card">
+            <div class="card-img new-recipe-img">+</div>
+            <div class="card-body">
+                <div class="card-title">New Recipe</div>
+            </div>
+        </a>
+        {% endif %}
+        {% for recipe in recipes %}
+        {% include "_recipe_card.html" %}
+        {% endfor %}
+    </div>
+
+    <!-- Shopping list view (hidden by default) -->
+    <div id="shopping-list-view" style="display:none;">
+        <a href="#" class="back-link" id="back-to-selection">&larr; Back to selection</a>
+        <div class="detail-title">Shopping List</div>
+        <p style="color:var(--text-muted);margin-bottom:20px;font-size:15px;" id="shopping-list-subtitle"></p>
+        <div class="unit-toggle" id="shopping-unit-toggle">
+            <button class="active" data-unit="volume">Volume</button>
+            <button data-unit="weight">Weight (g)</button>
+        </div>
+        <div id="shopping-list-content"></div>
+    </div>
+</div>
+
+<!-- Plan bar -->
+<div class="plan-bar" id="plan-bar">
+    <div class="plan-bar-items" id="plan-bar-items"></div>
+    <button class="plan-btn" id="generate-list-btn">Generate List &rarr;</button>
+</div>
+{% endblock %}
