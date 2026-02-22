@@ -122,7 +122,7 @@
   // Card clicks
   recipeGrid.addEventListener("click", function (e) {
     if (mode !== "plan") return;
-    var card = e.target.closest(".recipe-card");
+    var card = e.target.closest(".recipe-card[data-recipe-id]");
     if (!card) return;
     e.preventDefault();
     var id = card.dataset.recipeId;
@@ -132,18 +132,17 @@
   });
 
   function updateCards() {
-    var cards = recipeGrid.querySelectorAll(".recipe-card");
+    var cards = recipeGrid.querySelectorAll(".recipe-card[data-recipe-id]");
     cards.forEach(function (card) {
       var id = card.dataset.recipeId;
       var qty = plan[id] || 0;
       var badge = card.querySelector(".badge");
       if (qty > 0 && mode === "plan") {
         card.classList.add("in-plan");
-        badge.style.display = "flex";
-        badge.textContent = qty;
+        if (badge) { badge.style.display = "flex"; badge.textContent = qty; }
       } else {
         card.classList.remove("in-plan");
-        badge.style.display = "none";
+        if (badge) badge.style.display = "none";
       }
 
       // In plan mode, prevent link navigation
