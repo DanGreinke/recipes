@@ -2,6 +2,16 @@
 
 {% block title %}{{ "Edit " + recipe.title if recipe else "New Recipe" }} — Our Kitchen{% endblock %}
 
+{% set units = ['cups','tbsp','tsp','count','grams','oz','lb','pieces'] %}
+
+{% macro unit_select(selected='cups') %}
+<select name="ing_unit[]">
+    {% for u in units %}
+    <option value="{{ u }}" {{ 'selected' if u == selected else '' }}>{{ u }}</option>
+    {% endfor %}
+</select>
+{% endmacro %}
+
 {% block content %}
 <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) if recipe else url_for('home') }}" class="back-link">&larr; {{ "Back to recipe" if recipe else "Back to recipes" }}</a>
 
@@ -48,31 +58,32 @@
         <div class="section-title">Ingredients</div>
         <div id="ingredient-rows">
             {% if ingredients %}
-            {% for ing in ingredients %}
-            <div class="ing-row">
-                <input type="text" name="ing_name[]" placeholder="Ingredient name" value="{{ ing.name }}">
-                <input type="number" name="ing_amount[]" placeholder="Amount" step="any" value="{{ ing.amount }}">
-                <select name="ing_unit[]">
-                    {% for u in ['cups','tbsp','tsp','count','grams','oz','lb','pieces'] %}
-                    <option value="{{ u }}" {{ 'selected' if ing.unit == u else '' }}>{{ u }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>
-            </div>
-            {% endfor %}
+                {% for ing in ingredients %}
+                <div class="ing-row">
+                    <div class="autocomplete-wrapper">
+                        <input type="text" name="ing_name[]" placeholder="Search ingredient…"
+                               class="ing-name-input" autocomplete="off"
+                               value="{{ ing.name }}" data-valid="true">
+                        <ul class="autocomplete-dropdown"></ul>
+                    </div>
+                    <input type="number" name="ing_amount[]" placeholder="Amount" step="any" value="{{ ing.amount }}">
+                    {{ unit_select(ing.unit or 'cups') }}
+                    <button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>
+                </div>
+                {% endfor %}
             {% else %}
-            {% for _ in range(3) %}
-            <div class="ing-row">
-                <input type="text" name="ing_name[]" placeholder="Ingredient name">
-                <input type="number" name="ing_amount[]" placeholder="Amount" step="any">
-                <select name="ing_unit[]">
-                    {% for u in ['cups','tbsp','tsp','count','grams','oz','lb','pieces'] %}
-                    <option value="{{ u }}">{{ u }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>
-            </div>
-            {% endfor %}
+                {% for _ in range(3) %}
+                <div class="ing-row">
+                    <div class="autocomplete-wrapper">
+                        <input type="text" name="ing_name[]" placeholder="Search ingredient…"
+                               class="ing-name-input" autocomplete="off" data-valid="false">
+                        <ul class="autocomplete-dropdown"></ul>
+                    </div>
+                    <input type="number" name="ing_amount[]" placeholder="Amount" step="any">
+                    {{ unit_select() }}
+                    <button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>
+                </div>
+                {% endfor %}
             {% endif %}
         </div>
         <button type="button" class="btn btn-secondary" id="add-ingredient-btn" style="margin-top:8px;">+ Add Ingredient</button>
@@ -103,21 +114,106 @@
 
 {% block scripts %}
 <script>
-function removeIngRow(btn) {
-    var rows = document.getElementById('ingredient-rows');
-    if (rows.children.length > 1) {
-        btn.closest('.ing-row').remove();
-    }
+var UNITS = {{ units | tojson }};
+
+// ── Autocomplete ──────────────────────────────────────────────────────────
+
+function initAutocomplete(input) {
+    var wrapper = input.closest('.autocomplete-wrapper');
+    var dropdown = wrapper.querySelector('.autocomplete-dropdown');
+    var debounce;
+
+    input.addEventListener('input', function () {
+        input.dataset.valid = 'false';
+        clearTimeout(debounce);
+        var q = input.value.trim();
+        if (!q) { hideDropdown(dropdown); return; }
+        debounce = setTimeout(function () {
+            fetch('/api/ingredients/search?q=' + encodeURIComponent(q))
+                .then(function (r) { return r.json(); })
+                .then(function (names) { renderDropdown(input, dropdown, names); });
+        }, 200);
+    });
+
+    input.addEventListener('blur', function () {
+        setTimeout(function () { hideDropdown(dropdown); }, 150);
+    });
 }
 
-document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+function renderDropdown(input, dropdown, names) {
+    if (!names.length) { hideDropdown(dropdown); return; }
+    dropdown.innerHTML = '';
+    names.forEach(function (name) {
+        var li = document.createElement('li');
+        li.textContent = name;
+        li.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            input.value = name;
+            input.dataset.valid = 'true';
+            hideDropdown(dropdown);
+        });
+        dropdown.appendChild(li);
+    });
+    dropdown.style.display = 'block';
+}
+
+function hideDropdown(dropdown) {
+    dropdown.style.display = 'none';
+}
+
+document.querySelectorAll('.ing-name-input').forEach(initAutocomplete);
+
+// ── Add / remove rows ─────────────────────────────────────────────────────
+
+function makeUnitOptions() {
+    return UNITS.map(function (u) {
+        return '<option value="' + u + '">' + u + '</option>';
+    }).join('');
+}
+
+function removeIngRow(btn) {
     var rows = document.getElementById('ingredient-rows');
-    var first = rows.querySelector('.ing-row');
-    var clone = first.cloneNode(true);
-    clone.querySelectorAll('input').forEach(function(inp) { inp.value = ''; });
-    clone.querySelector('select').selectedIndex = 0;
-    rows.appendChild(clone);
+    if (rows.children.length > 1) btn.closest('.ing-row').remove();
+}
+
+document.getElementById('add-ingredient-btn').addEventListener('click', function () {
+    var rows = document.getElementById('ingredient-rows');
+    var div = document.createElement('div');
+    div.className = 'ing-row';
+    div.innerHTML =
+        '<div class="autocomplete-wrapper">' +
+            '<input type="text" name="ing_name[]" placeholder="Search ingredient…" ' +
+                   'class="ing-name-input" autocomplete="off" data-valid="false">' +
+            '<ul class="autocomplete-dropdown"></ul>' +
+        '</div>' +
+        '<input type="number" name="ing_amount[]" placeholder="Amount" step="any">' +
+        '<select name="ing_unit[]">' + makeUnitOptions() + '</select>' +
+        '<button type="button" class="btn btn-remove" onclick="removeIngRow(this)">&times;</button>';
+    rows.appendChild(div);
+    initAutocomplete(div.querySelector('.ing-name-input'));
+    div.querySelector('.ing-name-input').focus();
 });
+
+// ── Submit validation ─────────────────────────────────────────────────────
+
+document.querySelector('.recipe-form').addEventListener('submit', function (e) {
+    var invalid = false;
+    document.querySelectorAll('.ing-name-input').forEach(function (input) {
+        var filled = input.value.trim();
+        if (filled && input.dataset.valid !== 'true') {
+            input.classList.add('ing-invalid');
+            invalid = true;
+        } else {
+            input.classList.remove('ing-invalid');
+        }
+    });
+    if (invalid) {
+        e.preventDefault();
+        alert('Please select each ingredient from the dropdown, or clear the field to leave it blank.');
+    }
+});
+
+// ── Delete confirmation ───────────────────────────────────────────────────
 
 function confirmDelete() {
     if (confirm('Are you sure you want to delete this recipe? This cannot be undone.')) {

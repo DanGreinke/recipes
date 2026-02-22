@@ -81,6 +81,20 @@ def recipe_detail(recipe_id):
                            recipe=recipe, steps=steps, ingredients=ingredients)
 
 
+@app.route("/api/ingredients/search")
+def api_ingredients_search():
+    q = request.args.get("q", "").strip()
+    if not q:
+        return jsonify([])
+    db = get_db()
+    results = db.execute(
+        "SELECT name FROM ingredient WHERE name LIKE ? COLLATE NOCASE ORDER BY name LIMIT 10",
+        (f"%{q}%",),
+    ).fetchall()
+    db.close()
+    return jsonify([r["name"] for r in results])
+
+
 @app.route("/api/recipe/<int:recipe_id>/ingredients")
 def api_recipe_ingredients(recipe_id):
     unit = request.args.get("unit", "volume")

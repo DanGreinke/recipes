@@ -665,6 +665,52 @@ body {
   color: var(--accent);
 }
 
+/* ── Autocomplete ─────────────────────────────────────────────────────── */
+.autocomplete-wrapper {
+  position: relative;
+  flex: 2;
+}
+
+.autocomplete-wrapper input {
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  z-index: 50;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.autocomplete-dropdown li {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.autocomplete-dropdown li:hover {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+.ing-invalid {
+  border-color: #c53030 !important;
+  box-shadow: 0 0 0 2px #fde8e8 !important;
+}
+
 /* ── Recipe form ──────────────────────────────────────────────────────── */
 .ing-row {
   display: flex;
@@ -674,7 +720,6 @@ body {
 }
 
 .ing-row input[type="text"] {
-  flex: 2;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
