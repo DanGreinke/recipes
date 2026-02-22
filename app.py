@@ -182,6 +182,7 @@ def _parse_recipe_form():
     tags = request.form.get("tags", "").strip()
     source_url = request.form.get("source_url", "").strip() or None
     instructions_text = request.form.get("instructions", "").strip()
+    instructions_text = instructions_text.replace("\r\n", "\n").replace("\r", "\n")
     steps = [s.strip() for s in instructions_text.split("\n\n") if s.strip()]
 
     names = request.form.getlist("ing_name[]")
