@@ -15,6 +15,10 @@ from database import (
     insert_recipe, update_recipe, delete_recipe,
     replace_recipe_steps, replace_recipe_ingredients,
 )
+try:
+    from seed_king_arthur import seed as seed_ingredients
+except ImportError:
+    seed_ingredients = None
 from conversions import format_amount, to_weight, normalize_to_grams_per_cup
 
 app = Flask(__name__)
@@ -42,6 +46,11 @@ def ensure_db():
         db = get_db()
         seed_recipes(db)
         db.close()
+        if seed_ingredients:
+            try:
+                seed_ingredients()
+            except Exception as e:
+                app.logger.warning(f"Ingredient seeding skipped: {e}")
         app._db_initialized = True
 
 
