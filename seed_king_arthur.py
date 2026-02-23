@@ -10,8 +10,7 @@ from bs4 import BeautifulSoup
 from conversions import parse_fraction, parse_range, parse_volume_text, normalize_to_grams_per_cup
 from database import get_db, init_db
 
-HTML_PATH = os.path.join(os.path.dirname(__file__),
-                         "Ingredient Weight Chart _ King Arthur Baking.html")
+HTML_PATH = os.path.join(os.path.dirname(__file__), "king_arthur_chart.html")
 
 
 def parse_html(path):
