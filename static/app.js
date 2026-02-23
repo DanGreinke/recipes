@@ -50,6 +50,13 @@
     });
   }
 
+  function gramsToVolume(grams, gpc) {
+    var cups = grams / gpc;
+    if (cups >= 0.25) return formatAmt(cups) + " cups";
+    if (cups >= 1 / 16) return formatAmt(cups * 16) + " tbsp";
+    return formatAmt(cups * 48) + " tsp";
+  }
+
   function updateIngredientDisplay(useWeight) {
     var rows = document.querySelectorAll("#ingredient-list .ingredient-row");
     rows.forEach(function (row) {
@@ -63,17 +70,23 @@
       if (useWeight) {
         if (unitType === "count" && avgWeight) {
           amountEl.textContent = Math.round(amount * avgWeight) + " g";
+        } else if (unit === "grams" || unit === "g") {
+          amountEl.textContent = formatAmt(amount) + " g";
         } else if (gpc) {
           var grams = toWeight(amount, unit, gpc);
-          if (grams != null) {
-            amountEl.textContent = grams + " g";
-          }
+          if (grams != null) amountEl.textContent = grams + " g";
         }
       } else {
-        amountEl.textContent = formatAmt(amount) + " " + unit;
+        if ((unit === "grams" || unit === "g") && gpc) {
+          amountEl.textContent = gramsToVolume(amount, gpc);
+        } else {
+          amountEl.textContent = formatAmt(amount) + " " + unit;
+        }
       }
     });
   }
+
+  if (detailToggle) updateIngredientDisplay(false);
 
   // ── Home page: mode toggle + meal plan ───────────────────────────────
   var modeToggle = document.querySelector(".mode-toggle");
