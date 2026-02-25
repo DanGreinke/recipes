@@ -186,7 +186,7 @@
       if (!card) return;
       var title = card.dataset.title;
       var image = card.dataset.image;
-      var iconHtml = image && image.startsWith('static/')
+      var iconHtml = image && image.startsWith('uploads/')
         ? '<img src="/' + image + '" class="plan-bar-item-img" alt="">'
         : '<span class="plan-bar-item-emoji">' + image + '</span>';
 

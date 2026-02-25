@@ -5,7 +5,7 @@ import os
 import time
 from functools import wraps
 
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, send_from_directory
 from werkzeug.utils import secure_filename
 
 from database import (
@@ -192,10 +192,15 @@ def _save_image(file, recipe_id):
     """Save uploaded image and return the relative path for storage."""
     ext = file.filename.rsplit(".", 1)[1].lower()
     filename = f"{recipe_id}_{int(time.time())}.{ext}"
-    filepath = os.path.join(app.static_folder, "images", filename)
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    file.save(filepath)
-    return f"static/images/{filename}"
+    upload_dir = os.path.join(app.instance_path, "images")
+    os.makedirs(upload_dir, exist_ok=True)
+    file.save(os.path.join(upload_dir, filename))
+    return f"uploads/{filename}"
+
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(os.path.join(app.instance_path, "images"), filename)
 
 
 def _parse_recipe_form():

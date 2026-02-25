@@ -1,7 +1,7 @@
 <div class="recipe-card" data-recipe-id="{{ recipe.id }}" data-title="{{ recipe.title }}" data-image="{{ recipe.image_path }}">
     <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}" class="card-link" style="text-decoration:none;color:inherit;display:block;">
-        {% if recipe.image_path and recipe.image_path.startswith('static/') %}
-        <div class="card-img"><img src="{{ url_for('static', filename=recipe.image_path[7:]) }}" alt="{{ recipe.title }}" class="card-img-file"></div>
+        {% if recipe.image_path and recipe.image_path.startswith('uploads/') %}
+        <div class="card-img"><img src="{{ url_for('uploaded_file', filename=recipe.image_path[8:]) }}" alt="{{ recipe.title }}" class="card-img-file"></div>
         {% else %}
         <div class="card-img">{{ recipe.image_path }}</div>
         {% endif %}

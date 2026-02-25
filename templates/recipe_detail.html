@@ -6,8 +6,8 @@
 <a href="{{ url_for('home') }}" class="back-link">&larr; Back to recipes</a>
 
 <div class="detail-header">
-    {% if recipe.image_path and recipe.image_path.startswith('static/') %}
-    <img src="{{ url_for('static', filename=recipe.image_path[7:]) }}" alt="{{ recipe.title }}" class="detail-image">
+    {% if recipe.image_path and recipe.image_path.startswith('uploads/') %}
+    <img src="{{ url_for('uploaded_file', filename=recipe.image_path[8:]) }}" alt="{{ recipe.title }}" class="detail-image">
     {% else %}
     <span class="detail-emoji">{{ recipe.image_path }}</span>
     {% endif %}
