@@ -185,12 +185,15 @@
       var card = recipeGrid.querySelector('[data-recipe-id="' + id + '"]');
       if (!card) return;
       var title = card.dataset.title;
-      var emoji = card.dataset.image;
+      var image = card.dataset.image;
+      var iconHtml = image && image.startsWith('static/')
+        ? '<img src="/' + image + '" class="plan-bar-item-img" alt="">'
+        : '<span class="plan-bar-item-emoji">' + image + '</span>';
 
       var item = document.createElement("div");
       item.className = "plan-bar-item";
       item.innerHTML =
-        '<span class="plan-bar-item-emoji">' + emoji + '</span>' +
+        iconHtml +
         '<span class="plan-bar-item-title">' + title + '</span>' +
         '<button class="qty-btn" data-id="' + id + '" data-delta="-1">&minus;</button>' +
         '<span class="qty-value">' + qty + '</span>' +

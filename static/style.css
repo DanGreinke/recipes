@@ -391,6 +391,14 @@ body {
   font-size: 18px;
 }
 
+.plan-bar-item-img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 .plan-bar-item-title {
   font-size: 13px;
   max-width: 100px;
