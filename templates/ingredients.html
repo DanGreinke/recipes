@@ -45,11 +45,11 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="ounces">Ounces</label>
-                    <input type="number" id="ounces" name="ounces" step="any" placeholder="e.g. 4.25">
+                    <input type="number" id="ounces" name="ounces" step="any" placeholder="e.g. 4.25" oninput="ozToGrams(this.value)">
                 </div>
                 <div class="form-group">
-                    <label for="grams">Grams</label>
-                    <input type="number" id="grams" name="grams" step="any" placeholder="e.g. 120">
+                    <label for="grams">Grams <span id="grams-converted" style="font-size:11px;color:var(--text-muted);font-weight:normal;"></span></label>
+                    <input type="number" id="grams" name="grams" step="any" placeholder="e.g. 120" oninput="document.getElementById('grams-converted').textContent=''">
                 </div>
             </div>
         </div>
@@ -115,6 +115,19 @@
 {% block scripts %}
 <script>
 {% if is_admin %}
+// oz → grams converter
+function ozToGrams(val) {
+    var gramsInput = document.getElementById("grams");
+    var label = document.getElementById("grams-converted");
+    if (val && val > 0) {
+        var g = Math.round(parseFloat(val) * 28.3495 * 10) / 10;
+        gramsInput.value = g;
+        label.textContent = "(from oz)";
+    } else {
+        label.textContent = "";
+    }
+}
+
 // Unit type toggle
 document.getElementById("unit_type").addEventListener("change", function() {
     var val = this.value;
@@ -152,6 +165,7 @@ function editIngredient(id, name, unitType, volAmt, volUnit, ounces, grams, avgW
     document.getElementById("volume_unit").value = volUnit || "cup";
     document.getElementById("ounces").value = ounces != null ? ounces : "";
     document.getElementById("grams").value = grams != null ? grams : "";
+    document.getElementById("grams-converted").textContent = "";
     document.getElementById("avg_weight_grams").value = avgWeight != null ? avgWeight : "";
 
     document.getElementById("form-title").textContent = "Edit Ingredient";
@@ -172,6 +186,7 @@ function resetForm() {
     document.getElementById("volume_unit").value = "cup";
     document.getElementById("ounces").value = "";
     document.getElementById("grams").value = "";
+    document.getElementById("grams-converted").textContent = "";
     document.getElementById("avg_weight_grams").value = "";
 
     document.getElementById("form-title").textContent = "Add Ingredient";
